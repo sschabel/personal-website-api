@@ -22,6 +22,8 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import com.samschabel.pw.api.filter.CsrfCookieFilter;
 import com.samschabel.pw.api.filter.JwtAuthenticationFilter;
 import com.samschabel.pw.api.handler.SpaCsrfTokenRequestHandler;
+import com.samschabel.pw.api.model.security.AuthorityEnum;
+import com.samschabel.pw.api.repository.LkRoleRepository;
 import com.samschabel.pw.api.repository.UserRepository;
 import com.samschabel.pw.api.service.security.JwtService;
 import com.samschabel.pw.api.service.security.UserDetailsServiceImpl;
@@ -32,6 +34,8 @@ public class SecurityConfig {
 
     @Autowired
     JwtService jwtService;
+    @Autowired
+    LkRoleRepository lkRoleRepository;
     @Autowired
     UserRepository userRepository;
 
@@ -47,6 +51,7 @@ public class SecurityConfig {
                         .ignoringRequestMatchers(new AntPathRequestMatcher("/h2-console/**")))
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers("/csrf", "/login", "/h2-console/**").permitAll()
+                        .requestMatchers("/dashboard/**", "/blog-editor/**").hasAuthority(AuthorityEnum.ADMIN.toString())
                         .anyRequest().authenticated())
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
@@ -80,7 +85,7 @@ public class SecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return new UserDetailsServiceImpl(passwordEncoder(), userRepository);
+        return new UserDetailsServiceImpl(passwordEncoder(), userRepository, lkRoleRepository);
     }
 
 }

@@ -6,10 +6,9 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.context.ActiveProfiles;
 
+import com.samschabel.pw.api.model.security.RoleEnum;
 import com.samschabel.pw.api.model.security.UserDetailsImpl;
 
 @ActiveProfiles("Integration")
@@ -25,15 +24,14 @@ public class UserDetailsServiceImpl_IT {
         String username = "";
         String password = "";
         
-        List<GrantedAuthority> authorities = new ArrayList();
-        authorities.add(new SimpleGrantedAuthority("ADMIN"));
+        List<RoleEnum> roles = new ArrayList();
+        roles.add(RoleEnum.ADMIN);
         UserDetailsImpl user = new UserDetailsImpl();
         user.setEnabled(true);
         user.setUsername(username);
         user.setPassword(password);
-        user.setAuthorities(authorities);
         // when
-        cut.addUser(user);
+        cut.addUser(user, roles);
         // then
         // user should be added to the database
     }

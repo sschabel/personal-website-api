@@ -42,7 +42,7 @@ public class UserController {
         userDetails.setUsername(request.getUsername());
         userDetails.setPassword(request.getPassword());
         userDetails.setEnabled(true);
-        userService.addUser(userDetails);
+        userService.addUser(userDetails, request.getRoles());
     }
 
     @PostMapping("/login")
