@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,6 +15,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.samschabel.pw.api.exception.ApiException;
+import com.samschabel.pw.api.model.security.AuthorityEnum;
 import com.samschabel.pw.api.model.security.LoginRequest;
 import com.samschabel.pw.api.model.security.LoginResponse;
 import com.samschabel.pw.api.model.security.NewUserRequest;
@@ -53,8 +53,9 @@ public class UserController {
         if (authenticationResponse.isAuthenticated()) {
             User user = new User();
             user.setUsername(request.getUsername());
-            List<GrantedAuthority> authorities = new ArrayList();
-            authorities.addAll(authenticationResponse.getAuthorities());
+            List<AuthorityEnum> authorities = new ArrayList();
+            authenticationResponse.getAuthorities()
+                    .forEach(authority -> authorities.add(AuthorityEnum.valueOf(authority.getAuthority())));
             user.setAuthorities(authorities);
             LoginResponse response = new LoginResponse(jwtService.generateToken(request.getUsername()), user);
             return ResponseEntity.ok(response);
@@ -66,8 +67,10 @@ public class UserController {
     @GetMapping("/csrf")
     @ResponseStatus(value = HttpStatus.OK)
     public void csrfToken() {
-        // a GET HTTP method in order to have Spring Security set the XSRF Token as a cookie
-        // so future HTTP requests will be able to use that XSRF Token (X-XSRF-TOKEN) in a HTTP Header
+        // a GET HTTP method in order to have Spring Security set the XSRF Token as a
+        // cookie
+        // so future HTTP requests will be able to use that XSRF Token (X-XSRF-TOKEN) in
+        // a HTTP Header
     }
 
 }
