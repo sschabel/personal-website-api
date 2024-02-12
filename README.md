@@ -10,7 +10,8 @@
 ## Overview
 Backend API for my personal website UI. This is just for learning purposes.
 
-This is a work in progress. Still need to enable HTTPS and make changes to use a different datasource (something other than H2).
+> [!NOTE]
+> This is a work in progress. Still need to enable HTTPS and make changes to use a different datasource (something other than H2).
 
 ## Setup
 
