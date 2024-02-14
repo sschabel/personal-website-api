@@ -4,6 +4,7 @@
  - [Setup](#setup)
      - [Prerequisites](#prerequisites)
      - [Environment Variables](#environment-variables)
+     - [Enabling HTTPS for local development](#enabling-https-for-local-development)
  - [Building the application](#building-the-application)
  - [Running the application locally](#running-the-application-locally)
  - [Generating a secret for signing the bearer token](#generating-a-secret-for-signing-the-bearer-token)
@@ -22,12 +23,26 @@ You need the following software installed:
 
 ### Environment Variables
 The following environment variables need to be set in order for PW-API to work:
-|NAME|DESCRIPTION|
-|----|-----------|
-|PW-API_JWT_SECRET|This is the secret needed to sign the JSON Web Token (JWT) for PW-API. Specifically, this JWT is the bearer token used by the client. To generate a secure secret, reference [this section](#generating-a-secret-for-signing-the-bearer-token).|
-|PW-API_DATASOURCE_USERNAME|As of now, this is how the local H2 database used by PW-API gets its console username. This will be changed in the future to be externalized. This should only be used for testing purposes.|
-|PW-API_DATASOURCE_PASSWORD|As of now, this is how the local H2 database used by PW-API gets its console password. This will be changed in the future to be externalized. This should only be used for testing purposes.|
+|NAME|DESCRIPTION|REQUIRED or OPTIONAL|OPTIONS|DEFAULT|
+|----|-----------|--------------------|-------|-------|
+|PW-API_JWT_SECRET|This is the secret needed to sign the JSON Web Token (JWT) for PW-API. Specifically, this JWT is the bearer token used by the client. To generate a secure secret, reference [this section](#generating-a-secret-for-signing-the-bearer-token).|Required|
+|PW-API_DATASOURCE_USERNAME|As of now, this is how the local H2 database used by PW-API gets its console username. This will be changed in the future to be externalized. This should only be used for testing purposes.|Required|
+|PW-API_DATASOURCE_PASSWORD|As of now, this is how the local H2 database used by PW-API gets its console password. This will be changed in the future to be externalized. This should only be used for testing purposes.|Required|
+|PW-API_H2_CONSOLE_ENABLED|This controls whether the H2 database console will be able to be accessed locally via the H2 endpoint specified (/api/h2-console)|Optional|``true`` or ``false``|``false``|
+|PW-API_KEYSTORE_TYPE|The type of keystore you are using to hold your certificate.|Optional|``PKCS12`` or ``JKS``|``PKCS12``|
+|PW-API_KEYSTORE_PATH|The full path to your keystore including the keystore file name.|Required|
+|PW-API_KEYSTORE_PASSWORD|The password for your keystore.|Required|
+|PW-API_KEYSTORE_ALIAS|The alias for your keystore.|Required|
 
+### Enabling HTTPS for local development
+Run the following command to generate a self-signed certificate:
+```sh
+keytool -genkeypair -alias <insert-alias> -keyalg RSA -keysize 2048 -storetype PKCS12 -keystore <insert-keystore-name>.p12 -validity 3650
+```
+Then, update the below environment variables specified in the [Environment Variables](#environment-variables) section.
+  - PW-API_KEYSTORE_PATH
+  - PW-API_KEYSTORE_PASSWORD
+  - PW-API_KEYSTORE_ALIAS
 ## Building the application
 To build the application, you must have Apache Maven installed. Run the following command:
 ```sh
