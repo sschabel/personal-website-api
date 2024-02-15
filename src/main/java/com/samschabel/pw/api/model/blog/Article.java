@@ -1,8 +1,10 @@
 package com.samschabel.pw.api.model.blog;
 
 import java.sql.Blob;
+import java.sql.Clob;
 import java.util.List;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,7 +19,7 @@ public class Article {
     @NotBlank
     private String title;
     @NotBlank
-    private Blob content;
-    private List<String> tags;
+    private String content;
+    private List<@Valid @NotBlank String> tags;
 
 }

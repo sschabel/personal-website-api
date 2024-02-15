@@ -1,6 +1,6 @@
 package com.samschabel.pw.api.entity.blog;
 
-import java.sql.Blob;
+import java.sql.Clob;
 import java.util.List;
 
 import com.samschabel.pw.api.entity.StringListConverter;
@@ -11,6 +11,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,7 +28,8 @@ public class ArticleEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String title;
-    private Blob content;
+    @Lob
+    private String content;
     @Convert(converter = StringListConverter.class)
     private List<String> tags;
 
