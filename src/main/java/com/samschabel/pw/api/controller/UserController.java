@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -51,17 +52,19 @@ public class UserController {
                 .unauthenticated(request.getUsername(), request.getPassword());
         Authentication authenticationResponse = this.authenticationManager.authenticate(authenticationRequest);
         if (authenticationResponse.isAuthenticated()) {
-            User user = new User();
-            user.setUsername(request.getUsername());
-            List<AuthorityEnum> authorities = new ArrayList();
-            authenticationResponse.getAuthorities()
-                    .forEach(authority -> authorities.add(AuthorityEnum.valueOf(authority.getAuthority())));
-            user.setAuthorities(authorities);
-            LoginResponse response = new LoginResponse(jwtService.generateToken(request.getUsername()), user);
+            LoginResponse response = new LoginResponse(jwtService.generateToken(request.getUsername()),
+                    setupUserFromAuthentication(authenticationResponse));
             return ResponseEntity.ok(response);
         } else {
             throw new ApiException("Invalid user request.");
         }
+    }
+
+    @GetMapping("/user")
+    public ResponseEntity<User> getUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = setupUserFromAuthentication(authentication);
+        return ResponseEntity.ok(user);
     }
 
     @GetMapping("/csrf")
@@ -71,6 +74,16 @@ public class UserController {
         // cookie
         // so future HTTP requests will be able to use that XSRF Token (X-XSRF-TOKEN) in
         // a HTTP Header
+    }
+
+    private User setupUserFromAuthentication(Authentication authentication) {
+        User user = new User();
+        user.setUsername(((UserDetailsImpl) authentication.getPrincipal()).getUsername());
+        List<AuthorityEnum> authorities = new ArrayList();
+        authentication.getAuthorities()
+                .forEach(authority -> authorities.add(AuthorityEnum.valueOf(authority.getAuthority())));
+        user.setAuthorities(authorities);
+        return user;
     }
 
 }

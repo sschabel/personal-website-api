@@ -52,7 +52,7 @@ public class SecurityConfig {
                         .ignoringRequestMatchers(new AntPathRequestMatcher("/h2-console/**")))
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers("/csrf", "/login", "/h2-console/**").permitAll()
-                        .requestMatchers("/blog/**").hasAuthority(AuthorityEnum.ADMIN.toString())
+                        .requestMatchers("/blog/**", "/user").hasAuthority(AuthorityEnum.ADMIN.toString())
                         .anyRequest().authenticated())
                 .authenticationProvider(authenticationProvider())
                 .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
