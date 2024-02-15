@@ -43,6 +43,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         CookieCsrfTokenRepository cookieCsrfTokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
         cookieCsrfTokenRepository.setCookiePath("/");
+        cookieCsrfTokenRepository.setCookieCustomizer((customizer) -> customizer.maxAge(1800));
         return http
                 .headers((headers) -> headers.frameOptions((options) -> options.sameOrigin()))
                 .csrf((csrf) -> csrf
@@ -51,9 +52,8 @@ public class SecurityConfig {
                         .ignoringRequestMatchers(new AntPathRequestMatcher("/h2-console/**")))
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers("/csrf", "/login", "/h2-console/**").permitAll()
-                        .requestMatchers("/dashboard/**", "/blog-editor/**").hasAuthority(AuthorityEnum.ADMIN.toString())
+                        .requestMatchers("/blog/**").hasAuthority(AuthorityEnum.ADMIN.toString())
                         .anyRequest().authenticated())
-                .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
                 .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)

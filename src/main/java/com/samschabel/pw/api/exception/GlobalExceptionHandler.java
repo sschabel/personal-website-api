@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler
-    public final ResponseEntity<ApiError> handleBadCredentialsException(ApiException ex) {
+    public final ResponseEntity<ApiError> handleApiException(ApiException ex) {
         String message = "An API error occurred.";
         log.error(message, ex);
         return ResponseEntity.status(ex.getStatus())
