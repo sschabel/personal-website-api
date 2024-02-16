@@ -51,7 +51,7 @@ public class SecurityConfig {
                         .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler())
                         .ignoringRequestMatchers(new AntPathRequestMatcher("/h2-console/**")))
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers("/csrf", "/login", "/h2-console/**").permitAll()
+                        .requestMatchers("/csrf", "/login", "/h2-console/**", "/blog/articles").permitAll()
                         .requestMatchers("/blog/**", "/user").hasAuthority(AuthorityEnum.ADMIN.toString())
                         .anyRequest().authenticated())
                 .authenticationProvider(authenticationProvider())
