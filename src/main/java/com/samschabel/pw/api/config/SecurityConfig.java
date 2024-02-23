@@ -15,6 +15,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.CookieClearingLogoutHandler;
+import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
+import org.springframework.security.web.authentication.logout.LogoutSuccessEventPublishingLogoutHandler;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -27,6 +30,8 @@ import com.samschabel.pw.api.repository.LkRoleRepository;
 import com.samschabel.pw.api.repository.UserRepository;
 import com.samschabel.pw.api.service.security.JwtService;
 import com.samschabel.pw.api.service.security.UserDetailsServiceImpl;
+
+import jakarta.servlet.http.Cookie;
 
 @Configuration
 @EnableWebSecurity
@@ -41,9 +46,14 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        // use CookieCsrfTokenRepository in order to set path to the root instead of /api
         CookieCsrfTokenRepository cookieCsrfTokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
         cookieCsrfTokenRepository.setCookiePath("/");
         cookieCsrfTokenRepository.setCookieCustomizer((customizer) -> customizer.maxAge(1800));
+        // create cookie in order to set the path to the root instead of the /api path and then clear it on logout
+        Cookie bearerTokenCookie = new Cookie("pw-api_bearer", null);
+        bearerTokenCookie.setMaxAge(0);
+        bearerTokenCookie.setPath("/");
         return http
                 .headers((headers) -> headers.frameOptions((options) -> options.sameOrigin()))
                 .csrf((csrf) -> csrf
@@ -57,6 +67,9 @@ public class SecurityConfig {
                 .authenticationProvider(authenticationProvider())
                 .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+                .logout((logout) -> 
+                    logout.addLogoutHandler(new CookieClearingLogoutHandler(bearerTokenCookie))
+                    .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler()))
                 .build();
     }
 
