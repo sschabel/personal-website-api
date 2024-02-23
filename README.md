@@ -18,7 +18,7 @@ Backend API for my personal website UI. This is just for learning purposes.
 
 ### Prerequisites
 You need the following software installed:
-- Java 17 or later
+- Java 21 or later
 - Apache Maven
 
 ### Environment Variables
