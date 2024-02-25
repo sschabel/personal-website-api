@@ -10,5 +10,6 @@ import lombok.NoArgsConstructor;
 public class LoginResponse {
 
     private String bearerToken;
+    private String errorMessage;
     private User user;
 }

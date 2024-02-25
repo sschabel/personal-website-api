@@ -6,6 +6,9 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.samschabel.pw.api.exception.ApiException;
 import com.samschabel.pw.api.model.security.AuthorityEnum;
 import com.samschabel.pw.api.model.security.LoginRequest;
 import com.samschabel.pw.api.model.security.LoginResponse;
@@ -27,7 +29,9 @@ import com.samschabel.pw.api.service.security.UserDetailsServiceImpl;
 
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @AllArgsConstructor
 @RestController
 public class UserController {
@@ -50,13 +54,26 @@ public class UserController {
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
         Authentication authenticationRequest = UsernamePasswordAuthenticationToken
                 .unauthenticated(request.getUsername(), request.getPassword());
-        Authentication authenticationResponse = this.authenticationManager.authenticate(authenticationRequest);
-        if (authenticationResponse.isAuthenticated()) {
-            LoginResponse response = new LoginResponse(jwtService.generateToken(request.getUsername()),
-                    setupUserFromAuthentication(authenticationResponse));
-            return ResponseEntity.ok(response);
-        } else {
-            throw new ApiException("Invalid user request.");
+        try {
+            Authentication authenticationResponse = this.authenticationManager.authenticate(authenticationRequest);
+            if (authenticationResponse.isAuthenticated()) {
+                LoginResponse response = new LoginResponse(jwtService.generateToken(request.getUsername()),
+                        null, setupUserFromAuthentication(authenticationResponse));
+                return ResponseEntity.ok(response);
+            } else {
+                log.error("Invalid login for username " + request.getUsername());
+                return ResponseEntity.ok(new LoginResponse(null, "Invalid login.", null));
+            }
+        } catch (BadCredentialsException badCredentialsException) {
+            return ResponseEntity.ok(new LoginResponse(null, "Invalid username or password", null));
+
+        } catch (DisabledException disabledException) {
+            log.error("Disabled user attempted to login.", disabledException);
+            return ResponseEntity.ok(new LoginResponse(null, "Your account is disabled", null));
+
+        } catch (LockedException lockedException) {
+            log.error("Locked user attempted to login.", lockedException);
+            return ResponseEntity.ok(new LoginResponse(null, "Your account is locked", null));
         }
     }
 
