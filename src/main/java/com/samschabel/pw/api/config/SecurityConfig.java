@@ -44,11 +44,13 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        // use CookieCsrfTokenRepository in order to set path to the root instead of /api
+        // use CookieCsrfTokenRepository in order to set path to the root instead of
+        // /api
         CookieCsrfTokenRepository cookieCsrfTokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
         cookieCsrfTokenRepository.setCookiePath("/");
         cookieCsrfTokenRepository.setCookieCustomizer((customizer) -> customizer.maxAge(1800));
-        // create cookie in order to set the path to the root instead of the /api path and then clear it on logout
+        // create cookie in order to set the path to the root instead of the /api path
+        // and then clear it on logout
         Cookie bearerTokenCookie = new Cookie("pw-api_bearer", null);
         bearerTokenCookie.setMaxAge(0);
         bearerTokenCookie.setPath("/");
@@ -65,9 +67,8 @@ public class SecurityConfig {
                 .authenticationProvider(authenticationProvider())
                 .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-                .logout((logout) -> 
-                    logout.addLogoutHandler(new CookieClearingLogoutHandler(bearerTokenCookie))
-                    .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler()))
+                .logout((logout) -> logout.addLogoutHandler(new CookieClearingLogoutHandler(bearerTokenCookie))
+                        .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler()))
                 .build();
     }
 

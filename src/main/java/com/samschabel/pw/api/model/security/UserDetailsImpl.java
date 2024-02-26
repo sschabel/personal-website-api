@@ -21,11 +21,13 @@ public class UserDetailsImpl implements UserDetails {
     private String password;
     private List<GrantedAuthority> authorities;
     private boolean enabled;
+    private boolean locked;
 
     public UserDetailsImpl(UserEntity userEntity) {
         this.username = userEntity.getUsername();
         this.password = userEntity.getPassword();
         this.enabled = userEntity.isEnabled();
+        this.locked = userEntity.isLocked();
         this.authorities = new ArrayList();
         userEntity.getRoles().forEach((role) -> role.getAuthorities()
                 .forEach((authority) -> {
@@ -55,7 +57,7 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return !this.locked;
     }
 
     @Override

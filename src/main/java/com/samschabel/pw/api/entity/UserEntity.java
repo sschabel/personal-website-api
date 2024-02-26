@@ -27,6 +27,8 @@ public class UserEntity {
     String username;
     String password;
     boolean enabled;
+    boolean locked;
+    int loginAttempts;
 
     @JoinTable(
         name = "USER_ROLE",

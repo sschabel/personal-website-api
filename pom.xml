@@ -16,6 +16,7 @@
 	<properties>
 		<java.version>21</java.version>
 		<pw-api.jwt.version>0.12.5</pw-api.jwt.version>
+		<pw-api.assertj.version>3.25.3</pw-api.assertj.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -78,6 +79,12 @@
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<version>${pw-api.assertj.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

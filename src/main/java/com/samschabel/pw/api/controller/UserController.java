@@ -11,6 +11,7 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -65,15 +66,17 @@ public class UserController {
                 return ResponseEntity.ok(new LoginResponse(null, "Invalid login.", null));
             }
         } catch (BadCredentialsException badCredentialsException) {
+            userService.incrementLoginAttempts(request.getUsername());
             return ResponseEntity.ok(new LoginResponse(null, "Invalid username or password", null));
-
         } catch (DisabledException disabledException) {
-            log.error("Disabled user attempted to login.", disabledException);
+            log.info("Disabled user, " + request.getUsername() + " attempted to login.", disabledException);
             return ResponseEntity.ok(new LoginResponse(null, "Your account is disabled", null));
-
         } catch (LockedException lockedException) {
-            log.error("Locked user attempted to login.", lockedException);
+            log.info("Locked user, " + request.getUsername() + " attempted to login.", lockedException);
             return ResponseEntity.ok(new LoginResponse(null, "Your account is locked", null));
+        } catch (AuthenticationException authenticationException) {
+            log.info("Error occurred during login attempt for user, " + request.getUsername() + " .", authenticationException);
+            return ResponseEntity.ok(new LoginResponse(null, "An error occurred during login", null));
         }
     }
 

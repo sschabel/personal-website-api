@@ -18,7 +18,9 @@ import com.samschabel.pw.api.repository.LkRoleRepository;
 import com.samschabel.pw.api.repository.UserRepository;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @AllArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
 
@@ -44,6 +46,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         userEntity.setPassword(userDetails.getPassword());
         userEntity.setUsername(userDetails.getUsername());
         userEntity.setEnabled(true);
+        userEntity.setLocked(false);
+        userEntity.setLoginAttempts(0);
         List<LkRoleEntity> roleEntities = new ArrayList<>();
         roles.forEach(role -> {
             lkRoleRepository
@@ -52,6 +56,30 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         });
         userEntity.setRoles(roleEntities);
         userRepository.save(userEntity);
+    }
+
+    public void incrementLoginAttempts(String username) {
+        log.info("Bad credentials for user " + username + ". Incrementing login attempt count.");
+        
+        userRepository
+                .findByUsername(username)
+                .ifPresentOrElse(user -> checkLoginAttempts(user),
+                        () -> { // on else, throw exception
+                            String message = "User not found, " + username;
+                            throw new UsernameNotFoundException(message);
+                        });
+    }
+
+    private void checkLoginAttempts(UserEntity user) {
+        int loginAttempts = user.getLoginAttempts() < 0 ? 1 : user.getLoginAttempts() + 1; // increment user login attempts
+
+        if (loginAttempts >= 3 && !user.isLocked()) {
+            log.info("Locking user " + user.getUsername() + "with " + loginAttempts + " login attempts.");
+            user.setLocked(true);
+        }
+        
+        user.setLoginAttempts(loginAttempts);
+        userRepository.save(user);
     }
 
 }
