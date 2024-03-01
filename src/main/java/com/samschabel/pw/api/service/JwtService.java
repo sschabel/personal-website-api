@@ -1,4 +1,4 @@
-package com.samschabel.pw.api.service.security;
+package com.samschabel.pw.api.service;
 
 import java.util.Calendar;
 import java.util.Date;

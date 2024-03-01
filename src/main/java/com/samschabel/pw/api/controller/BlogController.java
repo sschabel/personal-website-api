@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.samschabel.pw.api.model.blog.Article;
-import com.samschabel.pw.api.service.security.blog.BlogService;
+import com.samschabel.pw.api.service.BlogService;
 
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;

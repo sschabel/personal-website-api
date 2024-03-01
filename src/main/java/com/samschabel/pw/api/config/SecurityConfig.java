@@ -26,8 +26,8 @@ import com.samschabel.pw.api.handler.SpaCsrfTokenRequestHandler;
 import com.samschabel.pw.api.model.security.AuthorityEnum;
 import com.samschabel.pw.api.repository.LkRoleRepository;
 import com.samschabel.pw.api.repository.UserRepository;
-import com.samschabel.pw.api.service.security.JwtService;
-import com.samschabel.pw.api.service.security.UserDetailsServiceImpl;
+import com.samschabel.pw.api.service.JwtService;
+import com.samschabel.pw.api.service.UserDetailsServiceImpl;
 
 import jakarta.servlet.http.Cookie;
 
@@ -61,7 +61,7 @@ public class SecurityConfig {
                         .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler())
                         .ignoringRequestMatchers(new AntPathRequestMatcher("/h2-console/**")))
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers("/csrf", "/login", "/h2-console/**", "/blog/articles").permitAll()
+                        .requestMatchers("/csrf", "/login", "/h2-console/**", "/blog/articles", "/recaptcha/**").permitAll()
                         .requestMatchers("/blog/**", "/user").hasAuthority(AuthorityEnum.ADMIN.toString())
                         .anyRequest().authenticated())
                 .authenticationProvider(authenticationProvider())

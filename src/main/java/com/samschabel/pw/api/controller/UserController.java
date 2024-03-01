@@ -1,10 +1,12 @@
 package com.samschabel.pw.api.controller;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -23,10 +25,13 @@ import com.samschabel.pw.api.model.security.AuthorityEnum;
 import com.samschabel.pw.api.model.security.LoginRequest;
 import com.samschabel.pw.api.model.security.LoginResponse;
 import com.samschabel.pw.api.model.security.NewUserRequest;
+import com.samschabel.pw.api.model.security.ReCaptchaActionEnum;
+import com.samschabel.pw.api.model.security.ReCaptchaStatus;
 import com.samschabel.pw.api.model.security.User;
 import com.samschabel.pw.api.model.security.UserDetailsImpl;
-import com.samschabel.pw.api.service.security.JwtService;
-import com.samschabel.pw.api.service.security.UserDetailsServiceImpl;
+import com.samschabel.pw.api.service.JwtService;
+import com.samschabel.pw.api.service.ReCaptchaService;
+import com.samschabel.pw.api.service.UserDetailsServiceImpl;
 
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -39,6 +44,7 @@ public class UserController {
 
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final ReCaptchaService reCaptchaService;
     private final UserDetailsServiceImpl userService;
 
     @PostMapping("/addNewUser")
@@ -52,7 +58,12 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) throws HttpMessageNotWritableException, IOException {
+        ReCaptchaStatus reCaptchaStatus = reCaptchaService.verifyToken(ReCaptchaActionEnum.LOGIN, request.getReCaptchaToken());
+        if(!reCaptchaStatus.isThresholdMet()) {
+            log.info("User, " + request.getUsername() + " ReCaptcha Token did not meet threshold.");
+            return ResponseEntity.ok(new LoginResponse(null, "Invalid login. Contact the administrator.", null));
+        }
         Authentication authenticationRequest = UsernamePasswordAuthenticationToken
                 .unauthenticated(request.getUsername(), request.getPassword());
         try {

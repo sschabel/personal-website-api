@@ -12,6 +12,7 @@ import org.springframework.test.context.ActiveProfiles;
 import com.samschabel.pw.api.TestNameUtils;
 import com.samschabel.pw.api.model.security.RoleEnum;
 import com.samschabel.pw.api.model.security.UserDetailsImpl;
+import com.samschabel.pw.api.service.UserDetailsServiceImpl;
 
 @ActiveProfiles("Integration")
 @SpringBootTest

@@ -1,4 +1,4 @@
-package com.samschabel.pw.api.service.security.blog;
+package com.samschabel.pw.api.service;
 
 import java.util.ArrayList;
 import java.util.List;
