@@ -19,7 +19,9 @@ Backend API for my personal website UI. This is just for learning purposes.
 ### Prerequisites
 You need the following software installed:
 - Java 21 or later
-- Apache Maven
+
+Optional software:
+- Apache Maven (since this project includes a Apache Maven wrapper)
 
 ### Environment Variables
 The following environment variables need to be set in order for PW-API to work:
@@ -33,6 +35,7 @@ The following environment variables need to be set in order for PW-API to work:
 |PW-API_KEYSTORE_PATH|The full path to your keystore including the keystore file name.|Required|
 |PW-API_KEYSTORE_PASSWORD|The password for your keystore.|Required|
 |PW-API_KEYSTORE_ALIAS|The alias for your keystore.|Required|
+|PW-API_RECAPTCHA_SECRET|This is the secret token issued by Google's ReCaptcha admin console. See the [ReCaptcha documentation](https://developers.google.com/recaptcha/docs/v3) for more details|Required|
 
 ### Enabling HTTPS for local development
 Run the following command to generate a self-signed certificate:
@@ -44,13 +47,26 @@ Then, update the below environment variables specified in the [Environment Varia
   - PW-API_KEYSTORE_PASSWORD
   - PW-API_KEYSTORE_ALIAS
 ## Building the application
-To build the application, you must have Apache Maven installed. Run the following command:
+To build the application, you can use the provided Apache Maven wrapper or use your own installed version of Apache Maven. 
+
+For using the provided Apache Maven wrapper, run the following command:
+```sh
+mvnw clean package
+```
+
+For using your own Apache Maven installation, run the following command:
 ```sh
 mvn clean package
 ```
 
 ## Running the application locally
-To run the application using the Apache Maven Spring Boot plugin, you must have Apache Maven installed. Run the following command to run the application locally:
+To run the application using the Apache Maven Spring Boot plugin, you can use the provided Apache Maven wrapper or use your own installed version of Apache Maven.
+
+To use the Apache Maven wrapper, run the following command to run the application locally:
+```sh
+mvnw spring-boot:run
+```
+To use your own Apache Maven install, run the following command to run the application locally:
 ```sh
 mvn spring-boot:run
 ```
